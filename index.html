@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JST Hebb Rule - Teori, Simulasi, dan Demo Lengkap | SMK Gajah Mada Banyuwangi</title>
+    <!-- MathJax CDN untuk render persamaan LaTeX -->
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        /* ==================== STYLING GLOBAL ==================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container-main {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+
+        /* ==================== TAB NAVIGATION ==================== */
+        .tabs {
+            display: flex;
+            border-bottom: 3px solid #3498db;
+            background-color: #f8f9fa;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 10px;
+            cursor: pointer;
+            background-color: #ecf0f1;
+            color: #333;
+            border: none;
+            border-right: 1px solid #bdc3c7;
+            font-size: 1.1rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .tab-button:last-child {
+            border-right: none;
+        }
+
+        .tab-button:hover {
+            background-color: #dfe6e9;
+        }
+
+        .tab-button.active {
+            background: #3498db;
+            color: white;
+            border-bottom: 3px solid #3498db;
+            margin-bottom: -3px;
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-content {
+            padding: 30px;
+        }
+
+        /* ==================== STYLING TEORI (FILE 2.html) ==================== */
+        .content-teori {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 25px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .section-title {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .step {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 4px solid #3498db;
+        }
+
+        .formula-box {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 1.1rem;
+            overflow-x: auto;
+        }
+
+        .highlight {
+            background: #fffacd;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .grid-demo {
+            display: grid;
+            grid-template-columns: repeat(3, 60px);
+            gap: 5px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .cell-teori {
+            width: 60px;
+            height: 60px;
+            background: #ecf0f1;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .cell-teori.active {
+            background: #3498db;
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .cell-teori.inactive {
+            background: #95a5a6;
+            color: white;
+            border-color: #7f8c8d;
+        }
+        /* ==================== AKHIR STYLING TEORI ==================== */
+
+        /* ==================== STYLING SIMULASI DASAR (FILE 0.html) ==================== */
+        .math-var {
+            font-family: serif;
+            font-style: italic;
+            font-size: 1.1em;
+            margin: 0 2px;
+        }
+
+        .math-dim {
+            font-family: monospace;
+            font-weight: bold;
+            font-size: 1em;
+            margin: 0 2px;
+        }
+
+        .hebb-box-basic {
+            background-color: #e8eaf6;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            border-left: 5px solid #3f51b5;
+        }
+
+        .pattern-area-basic {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .grid-container-basic {
+            flex: 1 1 250px;
+            text-align: center;
+        }
+
+        .grid-3x3-basic {
+            display: grid;
+            grid-template-columns: repeat(3, 50px);
+            gap: 2px;
+            margin: 10px auto;
+            width: fit-content;
+            border: 2px solid #3f51b5;
+            background-color: #fff;
+        }
+
+        .cell-basic {
+            width: 50px;
+            height: 50px;
+            background-color: #eee;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: background-color 0.1s;
+        }
+
+        .cell-basic.active {
+            background-color: #3f51b5;
+        }
+        
+        #trainButtonBasic { background-color: #007bff; }
+        #trainButtonBasic:hover { background-color: #0056b3; }
+        #recognizeButtonBasic { background-color: #28a745; }
+        #recognizeButtonBasic:hover { background-color: #1e7e34; }
+
+        .result-area-basic {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f1f8e9;
+            border-radius: 8px;
+            border: 1px solid #4caf50;
+        }
+
+        .process-log-basic pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            max-height: 200px;
+            font-size: 0.9em;
+            font-family: monospace;
+        }
+        /* ==================== AKHIR STYLING SIMULASI DASAR ==================== */
+        
+        /* ==================== STYLING DEMO LENGKAP (FILE 1.html) ==================== */
+        .grid-3x3 {
+            display: grid;
+            grid-template-columns: repeat(3, 70px);
+            gap: 5px;
+            margin: 20px auto;
+            width: fit-content;
+            border: 3px solid #3498db;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        .cell {
+            width: 70px;
+            height: 70px;
+            background-color: #ecf0f1;
+            cursor: pointer;
+            border: 2px solid #bdc3c7;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .cell.active {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border-color: #2980b9;
+        }
+
+        .cell-value {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            font-size: 0.8rem;
+            background: rgba(0,0,0,0.2);
+            padding: 2px 5px;
+            border-radius: 3px;
+            color: white;
+        }
+        
+        .example-patterns {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .example-pattern {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #3498db;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .example-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 30px);
+            gap: 2px;
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .example-cell {
+            width: 30px;
+            height: 30px;
+            border-radius: 4px;
+        }
+
+        .example-cell.active {
+            background: #3498db;
+        }
+
+        .example-cell.inactive {
+            background: #ecf0f1;
+        }
+        
+        .process-log pre {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            max-height: 400px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            font-family: 'Consolas', 'Monaco', monospace;
+            border-left: 5px solid #3498db;
+        }
+        
+        .recalled-symbol {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            display: block;
+            transition: all 0.3s;
+        }
+
+        .success {
+            background: linear-gradient(135deg, #d4edda, #c3e6cb);
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            color: #856404;
+            border: 2px solid #ffeaa7;
+        }
+        
+        .error {
+            background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .info {
+            background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        /* ==================== AKHIR STYLING DEMO LENGKAP ==================== */
+
+        /* Responsif */
+        @media (max-width: 768px) {
+            .step {
+                min-width: 100%;
+            }
+            .grid-demo, .grid-3x3, .grid-3x3-basic {
+                grid-template-columns: repeat(3, 40px);
+            }
+            .cell-teori, .cell, .cell-basic {
+                width: 40px;
+                height: 40px;
+                font-size: 0.9rem;
+            }
+            .tab-button {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container-main">
+        <div class="header">
+            <h1>SMK GAJAH MADA BANYUWANGI</h1>
+            <p>PENERAPAN MATEMATIKA VEKTOR DAN MATRIKS PADA JARINGAN SYARAF TIRUAN / KECERDASAN BUATAN</p>
+        </div>
+
+        <nav class="tabs">
+            <button class="tab-button active" onclick="switchTab('teori')">1. Teori Dasar & Konsep</button>
+            <button class="tab-button" onclick="switchTab('simulasi-dasar')">2. Simulasi Dasar (Fokus Matematika)</button>
+            <button class="tab-button" onclick="switchTab('demo-lengkap')">3. Demo Lengkap (Pola & Log)</button>
+        </nav>
+
+        <!-- ==================== TAB 1: TEORI DASAR (DARI FILE 2.html) ==================== -->
+        <div id="tab-teori" class="tab-content content-teori">
+            <div class="section">
+                <h2 class="section-title">🎯 Konsep Dasar: Otak Tiruan Sederhana</h2>
+                <p>Hebb Rule adalah algoritma pembelajaran yang meniru cara otak manusia belajar. Bayangkan kita memiliki <span class="highlight">9 neuron (sel saraf)</span> yang disusun dalam grid 3×3. Setiap neuron bisa <span class="highlight">AKTIF (+1)</span> atau <span class="highlight">NON-AKTIF (-1)</span>.</p>
+
+                <p><strong>Prinsip Hebb:</strong> "Neuron yang berkobar bersama, terhubung bersama" - semakin sering dua neuron aktif bersamaan, semakin kuat hubungannya!</p>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">1️⃣ TAHAP 1: SIMPAN POLA (PELATIHAN)</h2>
+                <p><strong>Apa yang terjadi:</strong> Kita "mengajari" jaringan dengan sebuah pola (misal: huruf 'A')</p>
+
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">1</div>
+                        <h3>Ubah Gambar jadi Angka</h3>
+                        <p>Setiap piksel diubah menjadi nilai:</p>
+                        <div class="grid-demo">
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori inactive">-1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori inactive">-1</div>
+                            <div class="cell-teori active">+1</div>
+                        </div>
+                        <p>Pola 'A' menjadi vektor Bipolar.</p>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">2</div>
+                        <h3>Hitung Matriks Bobot (W)</h3>
+                        <p>Bobot = ingatan jaringan. Diitung dengan rumus:</p>
+                        <div class="formula-box">\[ W_{ij} = X_i \times X_j \]</div>
+                        <p>Jika piksel 1 dan 2 SAMA-SAMA AKTIF: $W_{12} = (+1) \times (+1) = +1$ → Koneksi DIPERKUAT.</p>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">3</div>
+                        <h3>Simpan di Memori</h3>
+                        <p>Matriks W ($9 \times 9$) menyimpan semua hubungan antar piksel. Diagonal selalu 0 ($W_{ii}=0$).</p>
+                        <div class="analogy" style="background: #fff9e6; border-left: 5px solid #f39c12; padding: 15px; margin: 15px 0; border-radius: 0 8px 8px 0;">
+                            <h4>📖 Analogi: Belajar Bersama Teman</h4>
+                            <p>Semakin sering kamu dan temanmu melakukan aktivitas (belajar) yang sama (aktif bersama), semakin kuat "koneksi memori" kalian.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">2️⃣ TAHAP 2: UJI POLA BARU (PENGENALAN)</h2>
+                <p><strong>Apa yang terjadi:</strong> Kita berikan pola baru yang mungkin rusak atau tidak lengkap</p>
+
+                <div class="step-container">
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">1</div>
+                        <h3>Input Pola Uji</h3>
+                        <p>Masukkan pola baru (vektor $X_{uji}$), misal ada kesalahan di piksel tengah.</p>
+                        <div class="grid-demo">
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active" style="box-shadow: 0 0 5px red;">+1</div> <!-- ERROR -->
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori active">+1</div>
+                            <div class="cell-teori inactive">-1</div>
+                            <div class="cell-teori active">+1</div>
+                        </div>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">2</div>
+                        <h3>Jaringan "Mengingat" (Voting)</h3>
+                        <p>Setiap neuron baru dihitung berdasarkan pengaruh semua neuron lain (perkalian matriks dengan vektor):</p>
+                        <div class="formula-box">\[ Y_i = \sum_{j=1}^{N} (W_{ij} \times X_{uji, j}) \]</div>
+                        <p>Artinya: Setiap neuron "bertanya" kepada 8 neuron lain: "Apa yang seharusnya aku lakukan?"</p>
+                    </div>
+
+                    <div class="step">
+                        <div class="step-number" style="display: inline-block; background: #3498db; color: white; border-radius: 50%; width: 35px; height: 35px; text-align: center; line-height: 35px;">3</div>
+                        <h3>Fungsi Tanda (sgn)</h3>
+                        <p>Hasil penjumlahan $Y_i$ diubah menjadi keputusan biner (+1 atau -1):</p>
+                        <div class="formula-box" style="background: #e74c3c;">
+                            \[ \text{sgn}(Y) = \begin{cases} +1 & \text{jika } Y \ge 0 \\ -1 & \text{jika } Y < 0 \end{cases} \]
+                        </div>
+                        <p style="font-weight: bold; text-align: center; margin-top: 10px;">🗳️ Mayoritas bobot yang menang akan menentukan status akhir neuron.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="summary" style="background: linear-gradient(135deg, #a8edea, #fed6e3); padding: 25px; border-radius: 10px; margin-top: 30px;">
+                <h3>💡 KESIMPULAN HEBB RULE</h3>
+                <p>Hebb Rule adalah dasar dari **memori asosiatif** dalam Kecerdasan Buatan. Jaringan ini dapat mengenali atau memperbaiki pola yang tidak lengkap/rusak (seperti gambar) selama pola tersebut memiliki kemiripan yang cukup dengan pola yang telah disimpan sebelumnya.</p>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 2: SIMULASI DASAR (DARI FILE 0.html) ==================== -->
+        <div id="tab-simulasi-dasar" class="tab-content" style="display:none;">
+            <h2>Tujuan Pembelajaran dan Konsep Dasar</h2>
+            <p>
+                Simulasi ini menunjukkan penerapan Elemen Matematika **Aljabar dan Fungsi** (khususnya **Vektor** dan **Matriks**) dalam konteks Kecerdasan Buatan melalui algoritma **Aturan Hebb**.
+            </p>
+            <p>
+                **Konsep Inti:** Pola grid <span class="math-dim">3 &times; 3</span> diubah menjadi **Vektor** (<span class="math-var">X</span>). Hubungan antar piksel disimpan dalam **Matriks Bobot** (<span class="math-var">W</span>) berukuran <span class="math-dim">9 \times 9</span>.
+            </p>
+
+            <h2>1. Persamaan Matematis (Aturan Hebb)</h2>
+            <div style="background-color: #f0f4f7; padding: 15px; border-radius: 8px;">
+                <h3>A. Pelatihan (Penyimpanan Pola)</h3>
+                \[ W_{ij} = X_i \cdot X_j \quad (\text{untuk } i \ne j) \]
+                <h3>B. Pengujian (Pengenalan Pola)</h3>
+                \[ Y = \text{sgn}(W X_{uji}) \]
+            </div>
+
+            <div class="hebb-box-basic">
+                <h2>2. Simulasi Interaktif Dasar</h2>
+
+                <div class="pattern-area-basic">
+                    <div class="grid-container-basic">
+                        <h3>1. Pola Memori</h3>
+                        <div id="memoryGridBasic" class="grid-3x3-basic"></div>
+                        <p>Vektor <span class="math-var">X</span> yang disimpan.</p>
+                        <button id="trainButtonBasic" onclick="trainNetworkBasic()">Simpan Pola ini (Hitung W)</button>
+                    </div>
+
+                    <div class="grid-container-basic">
+                        <h3>2. Pola Uji</h3>
+                        <div id="inputGridBasic" class="grid-3x3-basic"></div>
+                        <p>Vektor <span class="math-var">X_{uji}</span> yang diuji.</p>
+                        <button id="recognizeButtonBasic" onclick="recognizePatternBasic()">3. Kenali Pola (W dikalikan X<sub>uji</sub>)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-area-basic">
+                <h2>3. Hasil Jaringan dan Alur Proses</h2>
+
+                <p><strong>A. Pola Yang Dikenali:</strong></p>
+                <div id="resultGridBasic" class="grid-3x3-basic"></div>
+                <span id="recalledSymbolBasic" class="recalled-symbol" style="color: #4caf50;">[Silakan Latih dan Kenali Pola]</span>
+
+                <p style="margin-top: 15px;"><strong>B. Alur Proses Perkalian Vektor/Matriks:</strong></p>
+                <div class="process-log-basic" id="processDetailBasic">
+                    <pre>Langkah 1: Hitung Matriks Bobot W.
+Langkah 2: Hitung perkalian W * X_uji dan terapkan fungsi sgn().</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: DEMO LENGKAP (DARI FILE 1.html) ==================== -->
+        <div id="tab-demo-lengkap" class="tab-content" style="display:none;">
+            <h2>📚 Contoh Pola untuk Percobaan</h2>
+            <p>Klik pada pola di bawah ini untuk langsung mengisi Grid Memori atau Grid Uji. Pola 'A' rusak sengaja dibuat untuk menguji kemampuan Jaringan memperbaiki error.</p>
+
+            <div class="example-patterns">
+                <div class="example-pattern" onclick="setPattern('A', 'memory')">
+                    <h4>Huruf 'A' (Memori)</h4>
+                    <div class="example-grid">
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                    </div>
+                </div>
+
+                <div class="example-pattern" onclick="setPattern('A_partial', 'test')">
+                    <h4>Huruf 'A' Rusak (Uji)</h4>
+                    <div class="example-grid">
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active" style="background: red;"></div> <!-- Error -->
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                    </div>
+                </div>
+
+                <div class="example-pattern" onclick="setPattern('plus', 'memory')">
+                    <h4>Tanda Plus (+)</h4>
+                    <div class="example-grid">
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                        <div class="example-cell active"></div>
+                        <div class="example-cell inactive"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hebb-box">
+                <h2>🧠 Simulasi Interaktif Hebb Rule</h2>
+                <p><strong>Petunjuk:</strong> 1) Pilih pola memori, 2) Klik "Simpan Pola", 3) Pilih pola uji (bisa rusak), 4) Klik "Kenali Pola"</p>
+
+                <div class="pattern-area">
+                    <div class="grid-container">
+                        <h3>1. POLA MEMORI (Vektor X)</h3>
+                        <div id="memoryGrid" class="grid-3x3"></div>
+                        <p><strong>Vektor X:</strong> <span id="memoryVector">[-1, -1, -1, -1, -1, -1, -1, -1, -1]</span></p>
+
+                        <div class="pattern-controls" style="gap: 5px;">
+                            <button id="trainButton" onclick="trainNetwork()">
+                                <span style="font-size: 1.2rem;">💾</span> Simpan Pola (Hitung W)
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid-container">
+                        <h3>2. POLA UJI (Vektor X_uji)</h3>
+                        <div id="inputGrid" class="grid-3x3"></div>
+                        <p><strong>Vektor X_uji:</strong> <span id="inputVector">[-1, -1, -1, -1, -1, -1, -1, -1, -1]</span></p>
+
+                        <div class="pattern-controls" style="gap: 5px;">
+                            <button id="recognizeButton" onclick="recognizePattern()">
+                                <span style="font-size: 1.2rem;">🔍</span> Kenali Pola (W × X_uji)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-area">
+                <h2>📊 Hasil Pengenalan Pola</h2>
+
+                <h3>A. Pola Yang Dikenali:</h3>
+                <div id="resultGrid" class="grid-3x3" style="margin: 20px auto;"></div>
+                <span id="recalledSymbol" class="recalled-symbol info">[Silakan simpan pola memori lalu uji dengan pola uji]</span>
+
+                <div class="calculation-steps" id="calculationSteps">
+                    <h3>B. Langkah Perhitungan Ringkas:</h3>
+                    <p>Setelah menjalankan proses, perhitungan detail akan muncul di sini...</p>
+                </div>
+
+                <div class="process-log">
+                    <h3>C. Detail Proses Matematis (Log Konsol):</h3>
+                    <pre id="processDetail">
+Langkah 1: Klik "Simpan Pola" untuk menghitung Matriks Bobot W.
+Langkah 2: Klik "Kenali Pola" untuk melihat proses perhitungan.
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==============================================================================
+        // ==================== GLOBAL TAB SWITCHING LOGIC ==============================
+        // ==============================================================================
+        function switchTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-button');
+
+            tabs.forEach(tab => tab.style.display = 'none');
+            buttons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(`tab-${tabId}`).style.display = 'block';
+            document.querySelector(`.tab-button[onclick*="${tabId}"]`).classList.add('active');
+
+            // Initialize the content only when its tab is selected
+            if (tabId === 'simulasi-dasar') {
+                initializeGridsBasic();
+            } else if (tabId === 'demo-lengkap') {
+                // Ensure the complex demo initializes correctly
+                initializeGrids(); 
+            }
+        }
+
+        // Set default tab on load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('teori');
+            initializeHebbRuleDemo(); // Call the complex demo initialization for initial setup
+        });
+        
+        // ==============================================================================
+        // ==================== SIMULASI DASAR (LOGIC DARI FILE 0.html) =================
+        // ==============================================================================
+        const N_BASIC = 9; 
+        let W_BASIC = Array(N_BASIC).fill(0).map(() => Array(N_BASIC).fill(0));
+        let P_MEMORY_BASIC = Array(N_BASIC).fill(-1); 
+        let P_INPUT_BASIC = Array(N_BASIC).fill(-1);  
+        let isTrainedBasic = false;
+
+        function initializeGridsBasic() {
+            const memoryGrid = document.getElementById('memoryGridBasic');
+            const inputGrid = document.getElementById('inputGridBasic');
+
+            const createGrid = (container, isMemory) => {
+                container.innerHTML = '';
+                for (let i = 0; i < N_BASIC; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell-basic';
+                    cell.dataset.index = i;
+                    cell.addEventListener('click', isMemory ? toggleMemoryCellBasic : toggleInputCellBasic);
+                    container.appendChild(cell);
+                }
+            };
+
+            // Inisialisasi Grid Memori (Pola 'A' sebagai default)
+            createGrid(memoryGrid, true);
+            const defaultA = [1, 1, 1, 1, -1, 1, 1, -1, 1];
+            defaultA.forEach((val, index) => {
+                if (val === 1) {
+                    memoryGrid.children[index].classList.add('active');
+                    P_MEMORY_BASIC[index] = 1;
+                }
+            });
+
+            // Inisialisasi Grid Input
+            createGrid(inputGrid, false);
+            
+            // Latih Jaringan Hebb sekali saat dimuat
+            trainNetworkBasic();
+        }
+
+        function toggleMemoryCellBasic(event) {
+            const cell = event.target;
+            const index = parseInt(cell.dataset.index);
+            cell.classList.toggle('active');
+            P_MEMORY_BASIC[index] = cell.classList.contains('active') ? 1 : -1;
+            isTrainedBasic = false;
+        }
+
+        function toggleInputCellBasic(event) {
+            const cell = event.target;
+            const index = parseInt(cell.dataset.index);
+            cell.classList.toggle('active');
+            P_INPUT_BASIC[index] = cell.classList.contains('active') ? 1 : -1;
+        }
+
+        function trainNetworkBasic() {
+            W_BASIC = Array(N_BASIC).fill(0).map(() => Array(N_BASIC).fill(0)); 
+            let log = `--- Langkah 1: Proses Pelatihan (Hitung Matriks Bobot W) ---\n`;
+            
+            for (let i = 0; i < N_BASIC; i++) {
+                for (let j = 0; j < N_BASIC; j++) {
+                    W_BASIC[i][j] = (P_MEMORY_BASIC[i] * P_MEMORY_BASIC[j]);
+                    if (i === j) {
+                        W_BASIC[i][j] = 0;
+                    }
+                }
+            }
+            log += `Matriks Bobot W (${N_BASIC}x${N_BASIC}) telah dihitung.\n`;
+            
+            document.getElementById('processDetailBasic').querySelector('pre').textContent = log;
+            document.getElementById('recalledSymbolBasic').textContent = "Pola baru telah tersimpan di Matriks Bobot W. Lanjut ke Pengujian.";
+            document.getElementById('recalledSymbolBasic').style.color = '#3f51b5';
+            isTrainedBasic = true;
+        }
+
+        function recognizePatternBasic() {
+            if (!isTrainedBasic) {
+                alert("⚠️ Silakan simpan pola memori terlebih dahulu dengan klik 'Simpan Pola ini (Hitung W)'!");
+                return;
+            }
+            let Y_PREDICT_SUM = Array(N_BASIC).fill(0);
+            let log = `--- Langkah 2: Proses Pengenalan (Y = sgn(W \u00D7 X_uji)) ---\n`;
+            let log_detail = [];
+
+            for (let i = 0; i < N_BASIC; i++) {
+                let sum = 0;
+                let sumLog = [];
+                for (let j = 0; j < N_BASIC; j++) {
+                    const term = W_BASIC[i][j] * P_INPUT_BASIC[j];
+                    sum += term;
+                    if (term !== 0) {
+                        sumLog.push(`(${W_BASIC[i][j]} \u00D7 ${P_INPUT_BASIC[j]})`); 
+                    }
+                }
+                Y_PREDICT_SUM[i] = sum;
+                log_detail.push(`Y[${i}] = ${sumLog.join(' + ')} = ${sum.toFixed(1)}`);
+            }
+            
+            const Y_FINAL_BIPOLAR = Y_PREDICT_SUM.map(sum => sum >= 0 ? 1 : -1);
+
+            log += `\nAlur Perhitungan Vektor Y (Y = W \u00D7 X_uji):\n`;
+            log += log_detail.join('\n');
+            log += `\n\n--- Fungsi Tanda (sgn) Diterapkan ---\n`;
+            Y_FINAL_BIPOLAR.forEach((val, i) => {
+                 log += `sgn(Y[${i}]) = sgn(${Y_PREDICT_SUM[i].toFixed(1)}) = ${val}\n`;
+            });
+            
+            const correctCount = Y_FINAL_BIPOLAR.filter((val, index) => val === P_MEMORY_BASIC[index]).length;
+            const successRate = (correctCount / N_BASIC) * 100;
+
+            log += `\n--- Hasil Pengenalan ---\n`;
+            log += `Total Piksel Cocok dengan Pola Asli: ${correctCount} dari ${N_BASIC} (${successRate.toFixed(1)}%).\n`;
+
+            document.getElementById('processDetailBasic').querySelector('pre').textContent = log;
+            displayResultBasic(Y_FINAL_BIPOLAR, successRate);
+        }
+
+        function displayResultBasic(Y_FINAL_BIPOLAR, successRate) {
+            const resultGrid = document.getElementById('resultGridBasic');
+            const recalledSymbol = document.getElementById('recalledSymbolBasic');
+            resultGrid.innerHTML = '';
+            const isMatch = successRate === 100;
+
+            Y_FINAL_BIPOLAR.forEach((val) => {
+                const cell = document.createElement('div');
+                cell.className = `cell-basic ${val === 1 ? 'active' : ''}`;
+                resultGrid.appendChild(cell);
+            });
+
+            if (isMatch) {
+                recalledSymbol.textContent = `BERHASIL: Pola Asli Dikenali Penuh! (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.style.color = '#28a745';
+            } else if (successRate > 70) {
+                 recalledSymbol.textContent = `DIKENALI: Pola mirip dengan memori (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.style.color = '#ff9800';
+            } else {
+                recalledSymbol.textContent = `GAGAL: Pola tidak dikenali atau terlalu banyak distorsi (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.style.color = '#dc3545';
+            }
+        }
+        
+        // ==============================================================================
+        // ==================== DEMO LENGKAP (LOGIC DARI FILE 1.html) ===================
+        // ==============================================================================
+        const N = 9; 
+        let W = Array(N).fill(0).map(() => Array(N).fill(0)); 
+        let P_MEMORY = Array(N).fill(-1); 
+        let P_INPUT = Array(N).fill(-1);  
+        let isTrained = false; 
+
+        const PATTERNS = {
+            'A': [1, 1, 1, 1, -1, 1, 1, -1, 1],
+            'A_partial': [1, 1, 1, 1, 1, 1, 1, -1, 1],
+            'L': [1, -1, -1, 1, -1, -1, 1, 1, 1], 
+            'plus': [-1, 1, -1, 1, 1, 1, -1, 1, -1],
+            'clear': [-1, -1, -1, -1, -1, -1, -1, -1, -1]
+        };
+
+        function initializeGrids() {
+            const memoryGrid = document.getElementById('memoryGrid');
+            const inputGrid = document.getElementById('inputGrid');
+
+            const createGrid = (container, isMemory) => {
+                container.innerHTML = '';
+                for (let i = 0; i < N; i++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    cell.dataset.index = i;
+                    
+                    const valueSpan = document.createElement('span');
+                    valueSpan.className = 'cell-value';
+                    valueSpan.textContent = '-1';
+                    cell.appendChild(valueSpan);
+                    
+                    cell.addEventListener('click', isMemory ? toggleMemoryCell : toggleInputCell);
+                    container.appendChild(cell);
+                }
+            };
+
+            createGrid(memoryGrid, true);
+            setPattern('A', 'memory');
+            createGrid(inputGrid, false);
+            setPattern('A_partial', 'test');
+            
+            updateVectorDisplays();
+            trainNetwork(); // Initial training for default pattern
+        }
+        
+        function initializeHebbRuleDemo() {
+            initializeGrids();
+            // Attach event listeners for the basic demo only when the tab is selected
+            // This is handled by switchTab('simulasi-dasar')
+        }
+
+        function setPattern(patternName, target) {
+            const pattern = PATTERNS[patternName];
+            if (!pattern) return;
+            
+            if (target === 'memory') {
+                P_MEMORY = [...pattern];
+                updateGridVisual('memoryGrid', P_MEMORY);
+                updateVectorDisplay('memoryVector', P_MEMORY);
+                isTrained = false;
+            } else if (target === 'test') {
+                P_INPUT = [...pattern];
+                updateGridVisual('inputGrid', P_INPUT);
+                updateVectorDisplay('inputVector', P_INPUT);
+            }
+        }
+
+        function updateGridVisual(gridId, vector) {
+            const grid = document.getElementById(gridId);
+            for (let i = 0; i < N; i++) {
+                const cell = grid.children[i];
+                const valueSpan = cell.querySelector('.cell-value');
+                
+                if (vector[i] === 1) {
+                    cell.classList.add('active');
+                    valueSpan.textContent = '+1';
+                    valueSpan.style.color = '#fff';
+                } else {
+                    cell.classList.remove('active');
+                    valueSpan.textContent = '-1';
+                    valueSpan.style.color = '#333';
+                }
+                
+                // Remove error styling from previous recall
+                cell.style.boxShadow = 'none'; 
+            }
+        }
+
+        function updateVectorDisplay(elementId, vector) {
+            const element = document.getElementById(elementId);
+            element.textContent = '[' + vector.join(', ') + ']';
+        }
+
+        function updateVectorDisplays() {
+            updateVectorDisplay('memoryVector', P_MEMORY);
+            updateVectorDisplay('inputVector', P_INPUT);
+        }
+
+        function toggleMemoryCell(event) {
+            const cell = event.target.closest('.cell');
+            const index = parseInt(cell.dataset.index);
+            cell.classList.toggle('active');
+            P_MEMORY[index] = cell.classList.contains('active') ? 1 : -1;
+            
+            const valueSpan = cell.querySelector('.cell-value');
+            valueSpan.textContent = P_MEMORY[index] === 1 ? '+1' : '-1';
+            valueSpan.style.color = P_MEMORY[index] === 1 ? '#fff' : '#333';
+            
+            updateVectorDisplay('memoryVector', P_MEMORY);
+            isTrained = false;
+            updateCalculationSteps();
+        }
+
+        function toggleInputCell(event) {
+            const cell = event.target.closest('.cell');
+            const index = parseInt(cell.dataset.index);
+            cell.classList.toggle('active');
+            P_INPUT[index] = cell.classList.contains('active') ? 1 : -1;
+            
+            const valueSpan = cell.querySelector('.cell-value');
+            valueSpan.textContent = P_INPUT[index] === 1 ? '+1' : '-1';
+            valueSpan.style.color = P_INPUT[index] === 1 ? '#fff' : '#333';
+            
+            updateVectorDisplay('inputVector', P_INPUT);
+        }
+
+        function trainNetwork() {
+            W = Array(N).fill(0).map(() => Array(N).fill(0)); 
+            let log = `=== PROSES PELATIHAN (Hitung Matriks Bobot W) ===\n\n`;
+            
+            log += `Pola Memori X = [${P_MEMORY.join(', ')}]\n\n`;
+            
+            let calculations = [];
+            
+            for (let i = 0; i < N; i++) {
+                for (let j = 0; j < N; j++) {
+                    const value = P_MEMORY[i] * P_MEMORY[j];
+                    W[i][j] = value;
+                    
+                    if (i === j) {
+                        W[i][j] = 0;
+                    } 
+                    // Log partial calculation
+                    if (i === 0 && j < 9) { // Log first row only for brevity
+                         calculations.push(`W[${i}][${j}] = ${P_MEMORY[i]} × ${P_MEMORY[j]} = ${W[i][j]} (Baris pertama)`);
+                    }
+                }
+            }
+            
+            log += `Rumus: W[i][j] = X[i] × X[j] (untuk i ≠ j), W[i][i] = 0\n`;
+            log += calculations.join('\n');
+            log += `\n... (lanjutan 8 baris lainnya)\n\n`;
+            
+            log += `=== Matriks Bobot W (${N}x${N}) telah dihitung ===\n`;
+            
+            document.getElementById('processDetail').textContent = log;
+            document.getElementById('recalledSymbol').textContent = "✅ Pola telah disimpan di Matriks Bobot W. Sekarang uji dengan pola baru!";
+            document.getElementById('recalledSymbol').className = "recalled-symbol success";
+            isTrained = true;
+            
+            updateCalculationSteps();
+        }
+
+        function recognizePattern() {
+            if (!isTrained) {
+                alert("⚠️ Silakan simpan pola memori terlebih dahulu dengan klik 'Simpan Pola'!");
+                return;
+            }
+            
+            let Y_PREDICT_SUM = Array(N).fill(0);
+            let log = `=== PROSES PENGENALAN (Y = sgn(W × X_uji)) ===\n\n`;
+            
+            log += `Pola Uji X_uji = [${P_INPUT.join(', ')}]\n\n`;
+            log += `Langkah 1: Hitung Y[i] = Σ(W[i][j] × X_uji[j])\n\n`;
+            
+            let calculationDetails = [];
+            for (let i = 0; i < N; i++) {
+                let sum = 0;
+                let detail = `Y[${i}] = `;
+                let terms = [];
+                
+                for (let j = 0; j < N; j++) {
+                    const term = W[i][j] * P_INPUT[j];
+                    sum += term;
+                    
+                    if (W[i][j] !== 0 && P_INPUT[j] !== 0) {
+                        terms.push(`(${W[i][j]} × ${P_INPUT[j]})`);
+                    }
+                }
+                Y_PREDICT_SUM[i] = sum;
+                
+                detail += terms.join(' + ');
+                detail += ` = ${sum.toFixed(1)}`;
+                calculationDetails.push(detail);
+            }
+            
+            log += calculationDetails.join('\n');
+            
+            log += `\n\nLangkah 2: Terapkan fungsi tanda sgn():\n`;
+            
+            const Y_FINAL_BIPOLAR = Y_PREDICT_SUM.map(sum => sum >= 0 ? 1 : -1);
+            let signDetails = [];
+            
+            for (let i = 0; i < N; i++) {
+                signDetails.push(`sgn(Y[${i}]) = sgn(${Y_PREDICT_SUM[i].toFixed(1)}) = ${Y_FINAL_BIPOLAR[i]}`);
+            }
+            
+            log += signDetails.join('\n');
+            
+            log += `\n\n=== HASIL PENGENALAN ===\n\n`;
+            log += `Pola Memori X     : [${P_MEMORY.join(', ')}]\n`;
+            log += `Pola Hasil Y      : [${Y_FINAL_BIPOLAR.join(', ')}]\n`;
+            
+            const correctCount = Y_FINAL_BIPOLAR.filter((val, index) => val === P_MEMORY[index]).length;
+            const successRate = (correctCount / N) * 100;
+            
+            log += `\nKesesuaian: ${correctCount} dari ${N} piksel cocok (${successRate.toFixed(1)}%)\n\n`;
+            
+            document.getElementById('processDetail').textContent = log;
+            
+            displayResult(Y_FINAL_BIPOLAR, successRate);
+            updateCalculationSteps(Y_PREDICT_SUM, Y_FINAL_BIPOLAR, correctCount, successRate);
+        }
+
+        function updateCalculationSteps(Y_SUM = null, Y_FINAL = null, correctCount = 0, successRate = 0) {
+            const stepsDiv = document.getElementById('calculationSteps');
+            
+            if (!isTrained) {
+                stepsDiv.innerHTML = `
+                    <h3>B. Langkah Perhitungan Ringkas:</h3>
+                    <p>1. Klik "Simpan Pola" untuk menghitung Matriks Bobot W</p>
+                `;
+                return;
+            }
+            
+            if (Y_SUM === null) {
+                stepsDiv.innerHTML = `
+                    <h3>B. Langkah Perhitungan Ringkas (Sampai Pelatihan):</h3>
+                    <p style="font-weight: bold; color: #2980b9;">1. Pelatihan Selesai: Matriks W (9×9) telah dihitung</p>
+                    <p>2. Siap untuk pengujian: Klik "Kenali Pola" untuk melanjutkan</p>
+                `;
+            } else {
+                stepsDiv.innerHTML = `
+                    <h3>B. Langkah Perhitungan Ringkas (Pengenalan):</h3>
+                    <p><strong>1. Hasil perkalian W × X_uji (Y):</strong> [${Y_SUM.map(v => v.toFixed(1)).join(', ')}]</p>
+                    <p><strong>2. Hasil Fungsi Tanda sgn(Y):</strong> [${Y_FINAL.join(', ')}]</p>
+                    <p style="font-weight: bold;">3. Tingkat Keberhasilan: ${successRate.toFixed(1)}% (${correctCount}/${N} piksel cocok)</p>
+                `;
+            }
+        }
+
+        function displayResult(Y_FINAL_BIPOLAR, successRate) {
+            const resultGrid = document.getElementById('resultGrid');
+            const recalledSymbol = document.getElementById('recalledSymbol');
+            resultGrid.innerHTML = '';
+            
+            const isMatch = successRate === 100;
+            const isPartial = successRate >= 70 && successRate < 100;
+            
+            Y_FINAL_BIPOLAR.forEach((val, index) => {
+                const cell = document.createElement('div');
+                cell.className = `cell ${val === 1 ? 'active' : ''}`;
+                
+                const valueSpan = document.createElement('span');
+                valueSpan.className = 'cell-value';
+                valueSpan.textContent = val === 1 ? '+1' : '-1';
+                valueSpan.style.color = val === 1 ? '#fff' : '#333';
+                cell.appendChild(valueSpan);
+                
+                // Highlight incorrect cells
+                if (val !== P_MEMORY[index]) {
+                    cell.style.boxShadow = 'inset 0 0 0 3px #e74c3c';
+                }
+                
+                resultGrid.appendChild(cell);
+            });
+
+            if (isMatch) {
+                recalledSymbol.textContent = `✅ BERHASIL: Pola Asli Dikenali Penuh! (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.className = "recalled-symbol success";
+            } else if (isPartial) {
+                recalledSymbol.textContent = `⚠️ DIKENALI SEBAGIAN: Pola mirip dengan memori (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.className = "recalled-symbol warning";
+            } else {
+                recalledSymbol.textContent = `❌ GAGAL: Pola tidak dikenali (${successRate.toFixed(0)}% cocok).`;
+                recalledSymbol.className = "recalled-symbol error";
+            }
+        }
+    </script>
+</body>
+</html>
